@@ -191,6 +191,8 @@ void VoxelMapBuilder2D::optimize(SyncPack &package)
         delta = Hess.inverse() * lb;
         isefk2d.X += delta;
         isefk2d.X.theta = normalize_angle(isefk2d.X.theta);
+        if (delta.cwiseAbs().maxCoeff() < 0.002)
+            break;
     }
     isefk2d.P = Hess.inverse();
 }
