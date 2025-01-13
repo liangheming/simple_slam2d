@@ -16,15 +16,23 @@ struct Config
     int max_iteration{10};
     float move_thresh{0.2f};
     float rotate_thresh{0.1f};
-    bool use_cluster{false};
     int max_voxel_number{500000};
+    int init_imu_num{20};
+    float obs_info{1000.0f};
 };
 
-struct ScanPack
+struct IMUData
 {
     double time{0.0};
-    Vec3f pose{Vec3f::Zero()};
-    std::vector<Vec2f> points{0};
+    Vec3f acc{Vec3f::Zero()};
+    Vec3f gyro{Vec3f::Zero()};
+};
+
+struct SyncPack
+{
+    double scan_time{0.0}; // 这个是scan的最后一帧的时间
+    std::vector<Vec2f> scan;
+    std::vector<IMUData> imus;
 };
 inline float normalize_theta(const float &angle)
 {

@@ -3,6 +3,7 @@
 #include "commons.h"
 #include <unordered_map>
 #include <unordered_set>
+#include "ieskf2d.h"
 
 #define HASH_P 116101
 #define MAX_N 10000000000
@@ -37,16 +38,29 @@ using VoxelMap2D = std::unordered_map<VoxelKey2D, VoxelGrid2D, VoxelKeyHash2D>;
 class VoxelMapBuilder2D
 {
 public:
-    VoxelMapBuilder2D() { voxel_map.reserve(500000); }
-    VoxelMapBuilder2D(const Config &config) : m_config(config) { voxel_map.reserve(500000); }
+    VoxelMapBuilder2D() : m_status(0)
+    {
+        voxel_map.reserve(500000);
+        m_cached_imus.clear();
+    }
+    VoxelMapBuilder2D(const Config &config) : m_config(config), m_status(0)
+    {
+        voxel_map.reserve(500000);
+        m_cached_imus.clear();
+    }
 
-    void update(ScanPack &package);
+    void update(SyncPack &pack);
 
-    bool optimize(ScanPack &package);
+    VoxelMap2D voxel_map;
 
+    IESKF2D isefk2d;
+
+private:
     VoxelKey2D index(const Vec2f &point);
 
     bool addPoint(const VoxelKey2D &key, const Vec2f &point);
+
+    bool initIMU(const SyncPack &pack);
 
     void updatePlane(VoxelGrid2D *grid);
 
@@ -55,10 +69,14 @@ public:
     void addClouds(const Vec3f &pose, const std::vector<Vec2f> &cloud);
     void setConfig(const Config &config) { m_config = config; }
 
-    VoxelMap2D voxel_map;
+    void propagation(const SyncPack &pack);
 
-private:
+    void optimize(SyncPack &pack);
+
     Config m_config;
-    bool m_is_initialized{false};
+    int m_status{0};
+    IMUData m_last_imu;
+    double m_last_scan_time{0.0};
+    std::vector<IMUData> m_cached_imus;
     std::list<VoxelKey2D> m_cache;
 };

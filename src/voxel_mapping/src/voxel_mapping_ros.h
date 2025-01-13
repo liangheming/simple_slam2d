@@ -5,32 +5,33 @@
 #include <sensor_msgs/PointCloud.h>
 #include <geometry_msgs/Point32.h>
 #include <geometry_msgs/TransformStamped.h>
-#include <tf/tf.h>
 #include <tf2_ros/transform_broadcaster.h>
-#include "map_builder/voxel_map2d.h"
+#include <tf/tf.h>
 
-inline void setPackage(const sensor_msgs::LaserScan::ConstPtr &msg, ScanPack &scan_pack, float ignore_range)
-{
-    scan_pack.points.clear();
-    scan_pack.time = msg->header.stamp.toSec();
-    float min_range = msg->range_min + 0.05;
-    float max_range = msg->range_max - 0.05;
-    for (int i = 0; i < msg->ranges.size(); i++)
-    {
-        float range = msg->ranges[i];
-        if (range < min_range || range > max_range || std::isinf(range) || std::isnan(range) || range < ignore_range)
-            continue;
-        float angle = normalize_theta(msg->angle_min + i * msg->angle_increment);
-        scan_pack.points.push_back(Vec2f(range * cos(angle), range * sin(angle)));
-    }
-}
+#include <queue>
+#include <mutex>
+#include "map_builder/voxel_map2d.h"
+#include <thread>
 
 struct NodeConfig
 {
     std::string scan_topic;
+    std::string imu_topic;
     std::string map_frame;
-    std::string scan_frame;
+    std::string body_frame;
     float ignore_range{0.5f};
+};
+struct NodeState
+{
+    std::queue<sensor_msgs::Imu::ConstPtr> imu_queue;
+    std::queue<sensor_msgs::LaserScan::ConstPtr> scan_queue;
+    std::mutex imu_mutex;
+    std::mutex scan_mutex;
+    std::mutex system_mutex;
+    double imu_last_time{0.0};
+    double scan_last_time{0.0};
+    bool scan_pushed{false};
+    bool is_activated{true};
 };
 class VoxelMappingROS
 {
@@ -40,16 +41,23 @@ public:
     void initPublishers();
     void initSubscribers();
     void scanCallback(const sensor_msgs::LaserScan::ConstPtr &msg);
+    void imuCallback(const sensor_msgs::Imu::ConstPtr &msg);
+    void mainLoop();
+    bool syncScanImu();
+    void filterScan(const sensor_msgs::LaserScan::ConstPtr &msg, std::vector<Vec2f> &scan);
     void publishScanPoints();
     void sendTransform();
 
 private:
     NodeConfig m_config;
+    NodeState m_state;
+    std::thread m_main_loop;
     Config m_map_config;
+    SyncPack m_sync_pack;
     ros::NodeHandle m_nh;
     ros::Subscriber m_scan_sub;
+    ros::Subscriber m_imu_sub;
     ros::Publisher m_scan_pub;
-    ScanPack m_package;
     tf2_ros::TransformBroadcaster m_tf_broadcaster;
     std::shared_ptr<VoxelMapBuilder2D> m_map_builder;
 };
