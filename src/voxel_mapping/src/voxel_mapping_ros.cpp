@@ -44,6 +44,7 @@ void VoxelMappingROS::loadParameters()
 void VoxelMappingROS::initPublishers()
 {
     m_scan_pub = m_nh.advertise<sensor_msgs::PointCloud>("points", 1);
+    m_odom_pub = m_nh.advertise<nav_msgs::Odometry>("odom", 1);
 }
 void VoxelMappingROS::initSubscribers()
 {
@@ -123,9 +124,13 @@ void VoxelMappingROS::mainLoop()
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         if (!syncScanImu())
             continue;
+        std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
         m_map_builder->update(m_sync_pack);
+        std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+        ROS_DEBUG("update time: %f ms", std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1).count() * 1000);
         publishScanPoints();
         sendTransform();
+        publishOdometry();
     }
 }
 void VoxelMappingROS::publishScanPoints()
@@ -157,4 +162,22 @@ void VoxelMappingROS::sendTransform()
     tf_msg.transform.translation.y = m_map_builder->isefk2d.X.pos.y();
     tf_msg.transform.rotation = tf::createQuaternionMsgFromYaw(m_map_builder->isefk2d.X.theta);
     m_tf_broadcaster.sendTransform(tf_msg);
+}
+void VoxelMappingROS::publishOdometry()
+{
+    if (m_odom_pub.getNumSubscribers() == 0)
+        return;
+    XState &state = m_map_builder->isefk2d.X;
+    nav_msgs::Odometry msg;
+    msg.header.stamp = ros::Time().fromSec(m_sync_pack.scan_time);
+    msg.header.frame_id = m_config.map_frame;
+    msg.child_frame_id = m_config.body_frame;
+    msg.pose.pose.position.x = state.pos.x();
+    msg.pose.pose.position.y = state.pos.y();
+    msg.pose.pose.orientation = tf::createQuaternionMsgFromYaw(state.theta);
+    Vec2f vel = Eigen::Rotation2Df(state.theta).inverse() * state.vel;
+    msg.twist.twist.linear.x = vel.x();
+    msg.twist.twist.linear.y = vel.y();
+    msg.twist.twist.angular.z = (m_sync_pack.imus.back().gyro.z() - state.bg);
+    m_odom_pub.publish(msg);
 }

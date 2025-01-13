@@ -5,6 +5,7 @@
 #include <sensor_msgs/PointCloud.h>
 #include <geometry_msgs/Point32.h>
 #include <geometry_msgs/TransformStamped.h>
+#include <nav_msgs/Odometry.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf/tf.h>
 
@@ -47,6 +48,7 @@ public:
     void filterScan(const sensor_msgs::LaserScan::ConstPtr &msg, std::vector<Vec2f> &scan);
     void publishScanPoints();
     void sendTransform();
+    void publishOdometry();
 
 private:
     NodeConfig m_config;
@@ -58,6 +60,7 @@ private:
     ros::Subscriber m_scan_sub;
     ros::Subscriber m_imu_sub;
     ros::Publisher m_scan_pub;
+    ros::Publisher m_odom_pub;
     tf2_ros::TransformBroadcaster m_tf_broadcaster;
     std::shared_ptr<VoxelMapBuilder2D> m_map_builder;
 };
