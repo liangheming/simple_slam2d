@@ -90,12 +90,12 @@ bool VoxelMapBuilder2D::optimize(ScanPack &package)
             return false;
         }
 
-        delta = Hess.ldlt().solve(lb);
+        delta = Hess.inverse() * lb;
         pose += delta;
-        pose(2) = normalize_angle(pose(2));
         if (abs(delta.x()) < 0.001 && abs(delta.y()) < 0.001 && abs(delta.z()) < 0.002)
             break;
     }
+    pose(2) = normalize_angle(pose(2));
     package.pose = pose;
     return true;
 }
