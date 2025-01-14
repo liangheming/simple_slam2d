@@ -1,0 +1,7 @@
+string save_dir
+float32 resolution
+float32 occ_prob
+float32 free_prob
+---
+bool success
+string message

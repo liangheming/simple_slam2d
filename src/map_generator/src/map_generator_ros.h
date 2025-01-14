@@ -9,6 +9,7 @@
 
 #include "generators/cloud_generator.h"
 #include "interfaces/StringTrigger.h"
+#include "interfaces/SaveGridMap.h"
 #include <filesystem>
 
 struct NodeConfig
@@ -27,6 +28,7 @@ public:
     void initServices();
     void syncCallback(const sensor_msgs::PointCloudConstPtr &cloud_msg, const nav_msgs::OdometryConstPtr &odom_msg);
     bool saveCloudSRVCB(interfaces::StringTrigger::Request &req, interfaces::StringTrigger::Response &res);
+    bool saveGridSRVCB(interfaces::SaveGridMap::Request &req, interfaces::SaveGridMap::Response &res);
 
 private:
     ros::NodeHandle m_nh;
@@ -38,4 +40,5 @@ private:
     std::shared_ptr<CloudGenerator> m_cloud_generator;
 
     ros::ServiceServer m_save_cloud_srv;
+    ros::ServiceServer m_save_grid_srv;
 };

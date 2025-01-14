@@ -1,0 +1,11 @@
+<launch>
+    <arg name="rviz" default="true" />
+    <env name="ROSCONSOLE_CONFIG_FILE" value="$(find map_manager)/conf/run.conf" />
+    <node pkg="map_manager" type="map_manager_node" name="map_manager" output="screen">
+        <param name="map_dir" value="$(env HOME)/temp/sim2d" />
+        <param name="yaml_name" value="map" />
+    </node>
+    <group if="$(arg rviz)">
+        <node pkg="rviz" type="rviz" name="rviz" args="-d $(find map_manager)/rviz/default.rviz" />
+    </group>
+</launch>

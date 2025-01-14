@@ -19,6 +19,10 @@ find_package(catkin REQUIRED COMPONENTS
 )
 find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)
+# find opencv
+find_package(OpenCV REQUIRED)
+find_package(yaml-cpp REQUIRED)
+
 
 catkin_package(
 #  INCLUDE_DIRS include
@@ -32,9 +36,10 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 aux_source_directory(src/generators SRC_LIST)
 
 add_executable(map_generator_node src/map_generator_node.cpp src/map_generator_ros.cpp ${SRC_LIST})
-target_link_libraries(map_generator_node ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(map_generator_node ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES} yaml-cpp)
 

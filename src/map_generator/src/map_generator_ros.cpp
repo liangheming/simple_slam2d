@@ -45,6 +45,7 @@ void MapGeneratorROS::syncCallback(const sensor_msgs::PointCloudConstPtr &cloud_
 void MapGeneratorROS::initServices()
 {
     m_save_cloud_srv = m_nh.advertiseService("save_cloud", &MapGeneratorROS::saveCloudSRVCB, this);
+    m_save_grid_srv = m_nh.advertiseService("save_grid", &MapGeneratorROS::saveGridSRVCB, this);
 }
 bool MapGeneratorROS::saveCloudSRVCB(interfaces::StringTrigger::Request &req, interfaces::StringTrigger::Response &res)
 {
@@ -59,5 +60,26 @@ bool MapGeneratorROS::saveCloudSRVCB(interfaces::StringTrigger::Request &req, in
     m_cloud_generator->saveCloud(file_path.string());
     res.success = true;
     res.message = "Cloud saved to: " + file_path.string();
+    return true;
+}
+bool MapGeneratorROS::saveGridSRVCB(interfaces::SaveGridMap::Request &req, interfaces::SaveGridMap::Response &res)
+{
+    std::filesystem::path save_dir = req.save_dir;
+    if (!std::filesystem::exists(save_dir))
+    {
+        res.success = false;
+        res.message = "Directory does not exist: " + save_dir.string();
+        return true;
+    }
+    if (req.resolution <= 0.0f || req.occ_prob <= 0.5f || req.free_prob <= 0.5f)
+    {
+        res.success = false;
+        res.message = "Invalid parameters";
+        return true;
+    }
+    m_cloud_generator->saveGrid(save_dir.string(), req.resolution, req.occ_prob, req.free_prob);
+
+    res.message = "Grid saved to: " + save_dir.string();
+    res.success = true;
     return true;
 }

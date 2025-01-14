@@ -6,6 +6,10 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
+#include <opencv2/opencv.hpp>
+#include <filesystem>
+#include <yaml-cpp/yaml.h>
+
 
 struct CloudGeneratorConfig
 {
@@ -31,6 +35,8 @@ public:
     std::vector<Vec2f> &getCloud() { return m_cloud; }
 
     void saveCloud(const std::string &filename);
+
+    void saveGrid(const std::string &filename, const float &resolution = 0.05f, const float &occ_prob = 0.8f, const float &free_prob = 0.6f);
 
 private:
     CloudGeneratorConfig m_config;

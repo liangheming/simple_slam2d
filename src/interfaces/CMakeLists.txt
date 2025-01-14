@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   StringTrigger.srv
+  SaveGridMap.srv
 )
 
 generate_messages(
