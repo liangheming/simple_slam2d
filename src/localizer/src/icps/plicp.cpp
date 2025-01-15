@@ -3,36 +3,8 @@
 PLICP::PLICP(const PLICPConfig &config) : m_config(config), m_target_tree(2, m_target_cloud) {}
 void PLICP::setTarget(const std::vector<Vec2f> &target)
 {
-    Vec2f x0y0(std::numeric_limits<float>::max(), std::numeric_limits<float>::max()), x1y1(std::numeric_limits<float>::min(), std::numeric_limits<float>::min());
-    // 找到最小最大点
-    for (const auto &point : target)
-    {
-        x0y0.x() = std::min(x0y0.x(), point.x());
-        x0y0.y() = std::min(x0y0.y(), point.y());
-        x1y1.x() = std::max(x1y1.x(), point.x());
-        x1y1.y() = std::max(x1y1.y(), point.y());
-    }
-    // 按照栅格进行将采样
-    std::unordered_map<unsigned int, std::pair<int, Vec2f>> grid_cloud;
-    int width = std::ceil((x1y1.x() - x0y0.x()) / m_config.resolution);
-    int height = std::ceil((x1y1.y() - x0y0.y()) / m_config.resolution);
-    grid_cloud.reserve(width * height);
-    for (const auto &point : target)
-    {
-        Vec2i xy = ((point - x0y0) / m_config.resolution).array().floor().cast<int>();
-        unsigned int idx = xy.y() * width + xy.x();
-        auto iter = grid_cloud.find(idx);
-        std::pair<int, Vec2f> *pair_ptr;
-        if (iter == grid_cloud.end())
-            pair_ptr = &(grid_cloud.insert({idx, std::make_pair(0, Vec2f::Zero())}).first->second);
-        else
-            pair_ptr = &(iter->second);
-        pair_ptr->first++;
-        pair_ptr->second += point;
-    }
-    m_target_cloud.points.reserve(grid_cloud.size());
-    for (auto &pair : grid_cloud)
-        m_target_cloud.points.emplace_back(pair.second.second / static_cast<float>(pair.second.first));
+    std::vector<Vec2f> cloud = grid_downsample(m_config.resolution, target);
+    m_target_cloud.points.assign(cloud.begin(), cloud.end());
     m_target_tree.buildIndex();
 }
 
@@ -97,15 +69,19 @@ bool PLICP::align(const std::vector<Vec2f> &input, float &score, Vec3f &pose)
             lb -= dp * 100.0f * loss;
         }
 
-        if (valid_count < 5.0f)
+        if (valid_count < 10.0f)
             return false;
 
         delta = Hess.inverse() * lb;
+        // std::cout << pose.transpose() << "|" << delta.transpose() << std::endl;
         pose += delta;
         if (delta.cwiseAbs().maxCoeff() < 0.001f)
             break;
     }
+
     score = total_loss / valid_count;
-    pose.z() = normalize_theta(pose.z());
+    // pose.z() = normalize_theta(pose.z());
+    // std::cout << "score: " << score << " total_loss:" << total_loss << " valid_count:" << valid_count << " pose: " << pose.transpose() << std::endl;
+    // std::cout << "===========================" << std::endl;
     return score < m_config.score_thresh;
 }
