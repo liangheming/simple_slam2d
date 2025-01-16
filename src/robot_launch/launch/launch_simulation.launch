@@ -1,0 +1,28 @@
+<launch>
+    <arg name="webot_home" default="/usr/local/webots" />
+    <env name="WEBOTS_HOME" value="$(arg webot_home)" />
+    <arg name="world" default="$(find turtlebot_sim)/worlds/f5.wbt" />
+    <arg name="mode" default="realtime" doc="Startup mode" />
+    <arg name="no_gui" default="false" doc="Start Webots with minimal GUI" />
+    <arg name="joy_enable" default="true" />
+    <node name="webots" pkg="turtlebot_sim" type="webots_launcher.py"
+        args="--world=$(arg world) --mode=$(arg mode) --no-gui=$(arg no_gui)" required="true" />
+
+    <env name="LD_LIBRARY_PATH" value="$(env LD_LIBRARY_PATH):$(arg webot_home)/lib/controller" />
+    <env name="PYTHONPATH" value="$(env PYTHONPATH):$(arg webot_home)/lib/controller/python" />
+    <node name="diff_controller" pkg="turtlebot_sim" type="turtlebot_controller.py" required="true"
+        output="screen" />
+
+    <group if="$(arg joy_enable)">
+        <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+            <param name="dev" value="/dev/input/js0" />
+            <param name="deadzone" value="0.5" />
+            <param name="autorepeat_rate" value="20" />
+        </node>
+
+        <node name="joy_to_cmd" pkg="turtlebot_sim" type="joy_to_cmd.py" output="screen">
+            <param name="max_vel" value="0.3" />
+            <param name="max_rot" value="0.5" />
+        </node>
+    </group>
+</launch>

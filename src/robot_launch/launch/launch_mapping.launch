@@ -1,11 +1,9 @@
 <launch>
-    <arg name="rviz" default="true" />
-    <env name="ROSCONSOLE_CONFIG_FILE" value="$(find voxel_mapping)/conf/run.conf" />
     <node pkg="voxel_mapping" type="voxel_mapping_node" name="voxel_mapping" output="screen">
-        <param name="map_frame" value="map" />
+        <param name="map_frame" value="laser" />
         <param name="scan_topic" value="/laser/scan" />
-        <param name="body_frame" value="laser" />
-        <param name="resolution" value="0.1" />
+        <param name="body_frame" value="scan" />
+        <param name="resolution" value="0.2" />
         <param name="plane_threshold" value="0.05" />
         <param name="max_iteration" value="10" />
         <param name="update_thresh" value="5.0" />
@@ -13,7 +11,11 @@
         <param name="ignore_range" value="0.1" />
         <param name="max_voxel_number" value="100000" />
     </node>
-    <group if="$(arg rviz)">
-        <node pkg="rviz" type="rviz" name="rviz" args="-d $(find voxel_mapping)/rviz/default.rviz" />
-    </group>
+
+    <node pkg="map_generator" type="map_generator_node" name="map_generator" output="screen">
+        <param name="cloud_topic" value="/voxel_mapping/points" />
+        <param name="odom_topic" value="/voxel_mapping/odom" />
+    </node>
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find robot_launch)/rviz/mapping.rviz" />
 </launch>
