@@ -1,0 +1,130 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Parquetry.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/BrushedAluminium.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/factory/containers/protos/WoodenBox.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/robots/robotis/turtlebot/protos/TurtleBot3Burger.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/apartment_structure/protos/Wall.proto"
+
+WorldInfo {
+  basicTimeStep 20
+  FPS 50
+}
+Viewpoint {
+  fieldOfView 1.2
+  orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
+  position 0.8496041836854626 0.15388135775272588 10.561327002493842
+  follow "turtle_bot"
+}
+RectangleArena {
+  name "f1"
+  floorSize 8 8
+  floorAppearance Parquetry {
+    type "light strip"
+    textureTransform TextureTransform {
+    }
+  }
+  wallHeight 1.6
+  wallAppearance BrushedAluminium {
+    textureTransform TextureTransform {
+    }
+  }
+}
+Wall {
+  translation 1 -2.8 0
+  name "w1"
+  size 6 0.4 1
+}
+Wall {
+  translation 1 2.7 0
+  name "w2"
+  size 6 0.4 1
+}
+Wall {
+  translation 2.72 -0.0199986 0
+  rotation 0 0 1 -1.5707953071795862
+  name "w2(1)"
+  size 4 0.5 1
+}
+TurtleBot3Burger {
+  hidden linearVelocity_0 -9.601434323724405e-17 -1.171315967452005e-16 1.484652494789154e-16
+  hidden angularVelocity_0 -8.696622644007026e-16 -2.142751997982955e-15 -7.190765545155354e-17
+  translation 0.08616336551568929 8.82309229480573e-09 -0.00015506372482003428
+  rotation -0.00211901209866447 -0.9999977519648037 7.650532547228867e-05 0.002891570809403523
+  name "turtle_bot"
+  controller "<extern>"
+  controllerArgs [
+    ""
+  ]
+}
+WoodenBox {
+  translation 1.46247 1.42247 0.3
+  rotation 0 0 1 1.5708
+  name "b0"
+}
+WoodenBox {
+  translation 1.70853 -1.64855 0.3
+  rotation 0 0 1 4.692820414042842e-06
+  name "b1"
+}
+WoodenBox {
+  translation -0.32647 1.20102 0.3
+  rotation 0 0 1 -1.047195307179586
+  name "b7"
+  size 0.8 1 0.6
+}
+WoodenBox {
+  translation -2.73147 -1.21857 0.3
+  rotation 0 0 1 0.785403
+  name "b2"
+}
+WoodenBox {
+  translation -2.10614 0.153873 0.3
+  rotation 0 0 1 4.692820414042842e-06
+  name "b4"
+}
+WoodenBox {
+  translation 3.26386 0.103899 0.3
+  rotation 0 0 1 4.692820414042842e-06
+  name "b4(4)"
+  size 0.6 0.4 0.6
+}
+WoodenBox {
+  translation 0.19386 -1.73613 0.3
+  rotation 0 0 1 4.692820414042842e-06
+  name "b4(2)"
+}
+WoodenBox {
+  translation -1.57614 -3.29 0.3
+  rotation 0 0 1 4.692820414042842e-06
+  name "b4(1)"
+  size 0.4 0.6 0.6
+}
+WoodenBox {
+  translation 1.97386 -3.8 0.3
+  rotation 0 0 1 4.692820414042842e-06
+  name "b4(3)"
+  size 0.4 0.4 0.6
+}
+WoodenBox {
+  translation 0.353847 3.7 0.3
+  rotation 0 0 1 4.692820414042842e-06
+  name "b8"
+  size 0.3 0.6 0.6
+}
+WoodenBox {
+  translation 2.73385 3.2 0.3
+  rotation 0 0 1 4.692820414042842e-06
+  name "b8(1)"
+  size 0.3 0.6 0.6
+}
+WoodenBox {
+  translation -2.98067 3.07428 0.3
+  rotation 0 0 1 0.523603
+  name "b6"
+}
+TexturedBackgroundLight {
+  castShadows FALSE
+}

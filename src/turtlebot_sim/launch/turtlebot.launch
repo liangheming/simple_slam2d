@@ -1,0 +1,37 @@
+<launch>
+    <arg name="webot_home" default="/usr/local/webots" />
+    <arg name="launch_joy" default="true" />
+    <arg name="publish_tf" default="true" />
+    <env name="WEBOTS_HOME" value="$(arg webot_home)" />
+    <arg name="world" default="$(find turtlebot_sim)/worlds/f5.wbt"  />
+    <arg name="mode" default="realtime" doc="Startup mode" />
+    <arg name="no_gui" default="false" doc="Start Webots with minimal GUI" />
+    <node name="webots" pkg="turtlebot_sim" type="webots_launcher.py"
+        args="--world=$(arg world) --mode=$(arg mode) --no-gui=$(arg no_gui)" required="true" />
+    <env name="LD_LIBRARY_PATH" value="$(env LD_LIBRARY_PATH):$(arg webot_home)/lib/controller" />
+    <env name="PYTHONPATH" value="$(env PYTHONPATH):$(arg webot_home)/lib/controller/python" />
+    <node name="diff_controller" pkg="turtlebot_sim" type="turtlebot_controller.py" required="true"
+        output="screen" />
+    <group if="$(arg launch_joy)">
+        <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+            <param name="dev" value="/dev/input/js0" />
+            <param name="deadzone" value="0.5" />
+            <param name="autorepeat_rate" value="20" />
+        </node>
+        <node name="joy_to_cmd" pkg="turtlebot_sim" type="joy_to_cmd.py" output="screen">
+            <param name="max_vel" value="0.3" />
+            <param name="max_rot" value="0.5" />
+        </node>
+    </group>
+
+    <group if="$(arg publish_tf)">
+        <node pkg="tf" type="static_transform_publisher" name="base_link_to_left_wheel"
+            args="0.0 0.08 0.033 0.0 0.0 0.0 /base_link /left_wheel 50" />
+        <node pkg="tf" type="static_transform_publisher" name="base_link_to_right_wheel"
+            args="0.0 -0.08 0.033 0.0 0.0 0.0 /base_link /right_wheel 50" />
+        <node pkg="tf" type="static_transform_publisher" name="base_link_to_imu"
+            args="-0.032 0 0.078 0.0 0.0 0.0 /base_link /imu 50" />
+        <node pkg="tf" type="static_transform_publisher" name="base_link_to_laser"
+            args="-0.03 0 0.173 0.0 0.0 0.0 /base_link /laser 50" />
+    </group>
+</launch>
