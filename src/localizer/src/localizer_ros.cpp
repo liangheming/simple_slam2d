@@ -70,6 +70,7 @@ void LocalizerROS::loadParameters()
 }
 void LocalizerROS::initSubscribers()
 {
+    m_init_pose_sub = m_nh.subscribe("/initialpose", 1, &LocalizerROS::initPoseCallBack, this);
     m_odom_sub.subscribe(m_nh, m_config.odom_topic, 1);
     m_point_sub.subscribe(m_nh, m_config.point_topic, 1);
     m_sync.connectInput(m_point_sub, m_odom_sub);
@@ -82,6 +83,7 @@ void LocalizerROS::initPublishers()
 }
 void LocalizerROS::initServices()
 {
+    m_relocalize_srv = m_nh.advertiseService("relocalize", &LocalizerROS::relocalizeCallBack, this);
 }
 void LocalizerROS::syncCallBack(const sensor_msgs::PointCloud::ConstPtr &cloud, const nav_msgs::Odometry::ConstPtr &odom)
 {
@@ -207,4 +209,39 @@ void LocalizerROS::sendtf(const ros::TimerEvent &)
     msg.transform.rotation = tf::createQuaternionMsgFromYaw(diff.z());
     m_tf_broadcaster.sendTransform(msg);
     m_state.send_time = m_state.last_time;
+}
+
+void LocalizerROS::initPoseCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &pose)
+{
+    m_state.reloc_mutex.lock();
+    m_state.relocalize_called = true;
+    m_state.reloc_pose = Vec3f(pose->pose.pose.position.x, pose->pose.pose.position.y, tf::getYaw(pose->pose.pose.orientation));
+    m_state.reloc_mutex.unlock();
+    ROS_DEBUG("LocalizerROS::reloc_pose: %f %f %f", m_state.reloc_pose.x(), m_state.reloc_pose.y(), m_state.reloc_pose.z());
+}
+
+bool LocalizerROS::relocalizeCallBack(interfaces::ReLocalize::Request &req, interfaces::ReLocalize::Response &res)
+{
+    if (req.reload)
+    {
+        std::filesystem::path pcd_path(req.pcd_path);
+        if (!std::filesystem::exists(pcd_path))
+        {
+            res.success = false;
+            res.message = pcd_path.string() + " is not exist";
+            return true;
+        }
+        m_state.reloc_mutex.lock();
+        std::vector<Vec2f> points;
+        readPCD(req.pcd_path, points);
+        m_plicp->setTarget(points);
+        m_state.reloc_mutex.unlock();
+    }
+    m_state.reloc_mutex.lock();
+    m_state.reloc_pose = Vec3f(req.x, req.y, req.yaw);
+    m_state.relocalize_called = true;
+    m_state.reloc_mutex.unlock();
+    res.success = true;
+    res.message = "relocalize called";
+    return true;
 }

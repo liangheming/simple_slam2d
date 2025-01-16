@@ -1,0 +1,8 @@
+string pcd_path
+bool reload
+float32 x
+float32 y
+float32 yaw
+---
+string message
+bool success

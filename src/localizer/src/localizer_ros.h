@@ -5,6 +5,7 @@
 #include <sensor_msgs/PointCloud.h>
 #include <geometry_msgs/Point32.h>
 #include <geometry_msgs/TransformStamped.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/exact_time.h>
@@ -19,6 +20,7 @@
 
 #include <filesystem>
 #include <tf2_ros/transform_broadcaster.h>
+#include "interfaces/ReLocalize.h"
 
 struct NodeConfig
 {
@@ -60,6 +62,9 @@ public:
     void mainLoop();
     void sendtf(const ros::TimerEvent &);
 
+    void initPoseCallBack(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &pose);
+    bool relocalizeCallBack(interfaces::ReLocalize::Request &req, interfaces::ReLocalize::Response &res);
+
 private:
     ros::NodeHandle m_nh;
     NodeState m_state;
@@ -70,9 +75,11 @@ private:
     message_filters::Synchronizer<message_filters::sync_policies::ExactTime<sensor_msgs::PointCloud, nav_msgs::Odometry>> m_sync;
     std::shared_ptr<PLICP> m_plicp;
 
+    ros::Subscriber m_init_pose_sub;
     ros::Publisher m_map_pub;
     std::thread m_thread;
     ros::Timer m_tf_timer;
     tf2_ros::TransformBroadcaster m_tf_broadcaster;
     ros::Publisher m_point_pub;
+    ros::ServiceServer m_relocalize_srv;
 };

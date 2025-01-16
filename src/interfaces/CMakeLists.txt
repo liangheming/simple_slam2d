@@ -13,6 +13,7 @@ add_service_files(
   FILES
   StringTrigger.srv
   SaveGridMap.srv
+  ReLocalize.srv
 )
 
 generate_messages(

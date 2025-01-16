@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   tf
   tf2_ros
+  interfaces
 )
 
 find_package(Eigen3 REQUIRED)
