@@ -5,7 +5,7 @@ odom_topic: /voxel_mapping/odom
 
 controller_frequency: 10 # 控制器的频率
 controller_patience: 10 # 控制器的容忍度，失败控制多久后进入恢复行为
-planner_frequency: 1.0 # 成功规划一条路径后，规划器的频率
+planner_frequency: 0.2 # 成功规划一条路径后，规划器的频率
 planner_patience: 10 # 规划器的容忍度，失败规划多久后进入恢复行为
 conservative_reset_dist: 3.0
 recovery_behavior_enabled: true # 是否开启恢复行为

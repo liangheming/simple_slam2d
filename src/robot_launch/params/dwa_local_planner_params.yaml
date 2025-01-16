@@ -1,23 +1,23 @@
 DWAPlannerROS:
-  max_vel_x: 0.21
-  min_vel_x: 0.01 #x方向最小值绝对值,如果为负值表示可以后退.
+  max_vel_x: 0.84
+  min_vel_x: -0.1 #x方向最小值绝对值,如果为负值表示可以后退.
   max_vel_y: 0.0  # y方向最大速度的绝对值.
   min_vel_y: 0.0   # y方向最小速度的绝对值.
 
-  max_vel_trans: 0.25 # choose slightly less than the base's capability  //平移速度最大值绝对值
-  min_vel_trans: 0.025  # this is the min trans velocity when there is negligible rotational velocity //平移速度最小值绝对值
-  trans_stopped_vel: 0.05 # 平移停止速度（meter/sec）
+  max_vel_trans: 0.84 # choose slightly less than the base's capability  //平移速度最大值绝对值
+  min_vel_trans: 0.1  # this is the min trans velocity when there is negligible rotational velocity //平移速度最小值绝对值
+  trans_stopped_vel: 0.1 # 平移停止速度（meter/sec）
 
   # Warning!
   #   do not set min_trans_vel to 0.0 otherwise dwa will always think translational velocities
   #   are non-negligible and small in place rotational velocities will be created.
 
-  max_vel_theta: 0.75  # choose slightly less than the base's capability  //theta轴最大速度的绝对值
+  max_vel_theta: 1.0  # choose slightly less than the base's capability  //theta轴最大速度的绝对值
   min_vel_theta: 0.1 # this is the min angular velocity when there is negligible translational velocity //theta轴最小速度的绝对值
   theta_stopped_vel: 0.1  #theta轴停止速度
   
-  acc_lim_x: 1.0 # maximum is theoretically 2.0, but we   # x轴加速度限制（meter/sec^2）
-  acc_lim_theta: 1.0  # theta轴角加速度限制（radian/sec^2）
+  acc_lim_x: 2.0 # maximum is theoretically 2.0, but we   # x轴加速度限制（meter/sec^2）
+  acc_lim_theta: 1.57  # theta轴角加速度限制（radian/sec^2）
   acc_lim_y: 0.0      # diff drive robot   # y轴加速度限制（meter/sec^2）
 
 # Goal Tolerance Parameters
@@ -27,14 +27,14 @@ DWAPlannerROS:
 
 # Forward Simulation Parameters
   sim_time: 2.1       # 1.7    # 前向仿真轨迹时间
-  vx_samples: 8       # 3      # 在x轴速度空间中搜索的样本数
+  vx_samples: 10       # 3      # 在x轴速度空间中搜索的样本数
   vy_samples: 1       # diff drive robot, there is only one sample   # 在y轴速度空间中搜索的样本数
   vtheta_samples: 20  # 20    # 在theta轴速度空间中搜索的样本数
 
 # Trajectory Scoring Parameters
   path_distance_bias: 35.0      # 32.0   - weighting for how much it should stick to the global path plan
    # 衡量控制器遵循给定路径的一致程度的加权值
-  goal_distance_bias: 10.0      # 24.0   - wighting for how much it should attempt to reach its goal
+  goal_distance_bias: 24.0      # 24.0   - wighting for how much it should attempt to reach its goal
    # 判断是否接近目标地点和控制速度的加权值
   occdist_scale: 0.1            # 0.01   - weighting for how much the controller should avoid obstacles
    # 有关避障的加权值 

@@ -43,7 +43,7 @@ class TurtleController:
 
         self.wheel_radius = 0.033
         self.wheel_track = 0.178
-        self.wheel_rot_vel = 6.669
+        self.wheel_rot_vel = 25.0
         self.max_speed = self.wheel_radius * self.wheel_rot_vel
 
         self.imu_message_lock = threading.Lock()
