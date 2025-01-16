@@ -1,0 +1,25 @@
+global_frame: map
+map_frame: map
+robot_frame: move_base
+odom_topic: /voxel_mapping/odom
+
+controller_frequency: 10 # 控制器的频率
+controller_patience: 10 # 控制器的容忍度，失败控制多久后进入恢复行为
+planner_frequency: 1.0 # 成功规划一条路径后，规划器的频率
+planner_patience: 10 # 规划器的容忍度，失败规划多久后进入恢复行为
+conservative_reset_dist: 3.0
+recovery_behavior_enabled: true # 是否开启恢复行为
+clearing_rotation_allowed: true # 是否允许旋转并清除障碍物
+
+oscillation_timeout: 30.0 # 震荡时间，30s没有超过震荡距离，就认为震荡，进入恢复行为
+oscillation_distance: 0.2 # 震荡距离，用于辅助震荡时间阈值判断
+
+recovery_behaviors:
+  - name: conservative_reset
+    type: clear_costmap_recovery/ClearCostmapRecovery
+  - name: rotate_recovery1
+    type: rotate_recovery/RotateRecovery
+  - name: aggressive_reset
+    type: clear_costmap_recovery/ClearCostmapRecovery
+  - name: rotate_recovery2
+    type: rotate_recovery/RotateRecovery

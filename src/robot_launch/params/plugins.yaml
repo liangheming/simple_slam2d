@@ -1,0 +1,5 @@
+clear_costmap_recovery:
+  conservative_reset:
+    reset_distance: 10.0
+  aggressive_reset:
+    reset_distance: 50.0

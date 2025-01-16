@@ -1,0 +1,57 @@
+<launch>
+
+    <node pkg="voxel_mapping" type="voxel_mapping_node" name="voxel_mapping" output="screen">
+        <param name="map_frame" value="laser" />
+        <param name="scan_topic" value="/laser/scan" />
+        <param name="body_frame" value="scan" />
+        <param name="resolution" value="0.2" />
+        <param name="plane_threshold" value="0.05" />
+        <param name="max_iteration" value="10" />
+        <param name="update_thresh" value="5.0" />
+        <param name="max_update_thresh" value="2000.0" />
+        <param name="ignore_range" value="0.1" />
+        <param name="max_voxel_number" value="100000" />
+    </node>
+
+
+    <node pkg="localizer" type="localizer_node" name="localizer" output="screen">
+        <param name="map_pcd_path" value="$(find robot_launch)/map/map.pcd" />
+        <param name="map_frame" value="map" />
+        <param name="odom_frame" value="laser" />
+        <param name="body_frame" value="scan" />
+        <param name="point_topic" value="/voxel_mapping/points" />
+        <param name="odom_topic" value="/voxel_mapping/odom" />
+        <param name="localize_hz" value="0.5" />
+        <param name="max_acc_num" value="5" />
+        <param name="scan_resolution" value="0.01" />
+        <param name="map_resolution" value="0.05" />
+        <param name="k_near" value="10" />
+        <param name="max_iteration" value="10" />
+        <param name="max_search_distance" value="1.0" />
+        <param name="plane_thresh" value="0.1" />
+        <param name="score_thresh" value="0.05" />
+    </node>
+
+    <node pkg="map_manager" type="map_manager_node" name="map_manager" output="screen">
+        <param name="map_dir" value="$(find robot_launch)/map" />
+        <param name="yaml_name" value="map" />
+    </node>
+     <node pkg="tf" type="static_transform_publisher" name="scan_to_move_base" args="-0.002 0.0 0.0 0.0 0.0 0.0 /scan /move_base 20" />
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen"
+        clear_params="true">
+        <rosparam file="$(find robot_launch)/params/move_base_params.yaml" command="load" />
+        <rosparam file="$(find robot_launch)/params/costmap_common_params.yaml" command="load"
+            ns="global_costmap" />
+        <rosparam file="$(find robot_launch)/params/costmap_common_params.yaml" command="load"
+            ns="local_costmap" />
+        <rosparam file="$(find robot_launch)/params/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find robot_launch)/params/global_costmap_params.yaml" command="load" />
+        <rosparam file="$(find robot_launch)/params/global_planner_params.yaml" command="load" />
+        <rosparam file="$(find robot_launch)/params/dwa_local_planner_params.yaml" command="load" />
+        <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+        <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+    </node>
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find robot_launch)/rviz/navigation.rviz" />
+</launch>

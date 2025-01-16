@@ -30,3 +30,11 @@ roslaunch robot_launch launch_localizer.launch
 rosservice call /localizer/relocalize "{pcd_path: 'your_pcd_path', reload: false, x: 0.0, y: 0.0, yaw: 0.0}"
 ```
 
+### 结合move_base的导航
+1. 启动仿真节点和里程计节点
+```bash
+roslaunch robot_launch launch_simulation.launch joy_enable:=false
+roslaunch robot_launch launch_navigation.launch
+```
+2. 在rviz中设置导航点
+
