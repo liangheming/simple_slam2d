@@ -1,10 +1,10 @@
 DWAPlannerROS:
-  max_vel_x: 0.2
+  max_vel_x: 0.4
   min_vel_x: -0.05 #x方向最小值绝对值,如果为负值表示可以后退.
   max_vel_y: 0.0  # y方向最大速度的绝对值.
   min_vel_y: 0.0   # y方向最小速度的绝对值.
 
-  max_vel_trans: 0.2 # choose slightly less than the base's capability  //平移速度最大值绝对值
+  max_vel_trans: 0.4 # choose slightly less than the base's capability  //平移速度最大值绝对值
   min_vel_trans: 0.05  # this is the min trans velocity when there is negligible rotational velocity //平移速度最小值绝对值
   trans_stopped_vel: 0.1 # 平移停止速度（meter/sec）
 
@@ -12,7 +12,7 @@ DWAPlannerROS:
   #   do not set min_trans_vel to 0.0 otherwise dwa will always think translational velocities
   #   are non-negligible and small in place rotational velocities will be created.
 
-  max_vel_theta: 0.5  # choose slightly less than the base's capability  //theta轴最大速度的绝对值
+  max_vel_theta: 0.75  # choose slightly less than the base's capability  //theta轴最大速度的绝对值
   min_vel_theta: 0.1 # this is the min angular velocity when there is negligible translational velocity //theta轴最小速度的绝对值
   theta_stopped_vel: 0.1  #theta轴停止速度
   
